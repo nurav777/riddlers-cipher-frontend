@@ -47,17 +47,41 @@ export interface ResetPasswordPayload {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = authToken || getStoredToken();
-  const res = await fetch(`${apiBaseUrl}${path}`, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options?.headers || {}),
-    },
-    ...options,
-  });
-  const data = (await res.json()) as T;
-  return data;
+  
+  try {
+    const res = await fetch(`${apiBaseUrl}${path}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options?.headers || {}),
+      },
+      ...options,
+    });
+
+    // Handle non-JSON responses
+    const contentType = res.headers.get("content-type");
+    let data: any;
+    
+    if (contentType?.includes("application/json")) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      console.error(`Non-JSON response from ${path}:`, text);
+      throw new Error(`Invalid response format from ${path}`);
+    }
+
+    // Check for HTTP errors
+    if (!res.ok) {
+      console.error(`API Error [${res.status}] ${path}:`, data);
+      throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
+    }
+
+    return data as T;
+  } catch (error) {
+    console.error(`Request failed for ${path}:`, error);
+    throw error;
+  }
 }
 
 export const AuthApi = {

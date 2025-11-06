@@ -132,22 +132,33 @@ const AuthPage = () => {
     setLoading(true);
 
     try {
+      console.log('Attempting login with email:', loginForm.email);
+      
       const response = await AuthApi.login({
         email: loginForm.email,
         password: loginForm.password,
       });
 
-      if (!response.success)
+      console.log('Login response received:', response);
+
+      if (!response.success) {
         throw new Error(response.message || "Login failed");
+      }
 
       const jwtToken = (response.data as any)?.jwtToken;
       const profile = (response.data as any)?.profile;
       const cognitoSub = (response.data as any)?.user?.sub || profile?.userId;
       
       console.log('Login response:', response);
+      console.log('JWT Token:', jwtToken ? 'Present' : 'Missing');
       console.log('Profile data from login:', profile);
       
-      if (jwtToken) setAuthToken(jwtToken);
+      if (!jwtToken) {
+        throw new Error('No JWT token received from server');
+      }
+      
+      setAuthToken(jwtToken);
+      console.log('JWT token stored successfully');
       
       // Store profile data in localStorage for use by other components
       if (profile) {
@@ -199,11 +210,12 @@ const AuthPage = () => {
       });
       navigate("/gotham");
     } catch (error) {
+      console.error('Login error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       toast({
         variant: "destructive",
         title: "Access Denied",
-        description:
-          "The Riddler has encrypted this system. Check your credentials.",
+        description: errorMessage || "The Riddler has encrypted this system. Check your credentials.",
       });
     } finally {
       setLoading(false);
