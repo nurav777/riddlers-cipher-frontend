@@ -1,0 +1,41 @@
+{
+  "TableName": "PlayerProgress",
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "playerId",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "lastPlayedTimestamp",
+      "AttributeType": "S"
+    }
+  ],
+  "KeySchema": [
+    {
+      "AttributeName": "playerId",
+      "KeyType": "HASH"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "LastPlayedIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "lastPlayedTimestamp",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      }
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 5,
+    "WriteCapacityUnits": 5
+  }
+}

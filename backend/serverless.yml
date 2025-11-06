@@ -1,0 +1,178 @@
+service: gotham-cipher-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${env:AWS_REGION, 'ap-southeast-2'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 30
+  logRetentionInDays: 14
+  
+  environment:
+    AWS_REGION: ${env:AWS_REGION}
+    AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
+    COGNITO_CLIENT_SECRET: ${env:COGNITO_CLIENT_SECRET}
+    POLLY_REGION: ${env:POLLY_REGION}
+    POLLY_ACCESS_KEY_ID: ${env:POLLY_ACCESS_KEY_ID}
+    POLLY_SECRET_ACCESS_KEY: ${env:POLLY_SECRET_ACCESS_KEY}
+    POLLY_VOICE_ID: ${env:POLLY_VOICE_ID}
+    POLLY_ENGINE: ${env:POLLY_ENGINE}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN}
+    DYNAMODB_TABLE_NAME: ${env:DYNAMODB_TABLE_NAME}
+    RIDDLES_TABLE_NAME: ${env:RIDDLES_TABLE_NAME}
+    PROGRESS_TABLE_NAME: ${env:PROGRESS_TABLE_NAME}
+    CLOUDWATCH_LOG_GROUP: ${env:CLOUDWATCH_LOG_GROUP}
+    CLOUDWATCH_LOG_STREAM: ${env:CLOUDWATCH_LOG_STREAM}
+    CLOUDWATCH_NAMESPACE: ${env:CLOUDWATCH_NAMESPACE}
+    SES_FROM_EMAIL: ${env:SES_FROM_EMAIL}
+    FRONTEND_URL: ${env:FRONTEND_URL}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${env:DYNAMODB_TABLE_NAME}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${env:RIDDLES_TABLE_NAME}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${env:PROGRESS_TABLE_NAME}
+        
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminGetUser
+            - cognito-idp:AdminCreateUser
+            - cognito-idp:AdminSetUserPassword
+            - cognito-idp:AdminConfirmSignUp
+            - cognito-idp:AdminUpdateUserAttributes
+            - cognito-idp:InitiateAuth
+            - cognito-idp:SignUp
+            - cognito-idp:ConfirmSignUp
+            - cognito-idp:ForgotPassword
+            - cognito-idp:ConfirmForgotPassword
+            - cognito-idp:ListUsers
+          Resource: arn:aws:cognito-idp:${self:provider.region}:*:userpool/*
+        
+        - Effect: Allow
+          Action:
+            - polly:SynthesizeSpeech
+          Resource: '*'
+        
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: '*'
+        
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:DescribeLogStreams
+          Resource: arn:aws:logs:${self:provider.region}:*:*
+        
+        - Effect: Allow
+          Action:
+            - cloudwatch:PutMetricData
+          Resource: '*'
+
+functions:
+  # Auth Functions
+  login:
+    handler: lambda/auth/login.handler
+    events:
+      - http:
+          path: auth/login
+          method: post
+          cors: true
+    description: User login endpoint
+
+  register:
+    handler: lambda/auth/register.handler
+    events:
+      - http:
+          path: auth/register
+          method: post
+          cors: true
+    description: User registration endpoint
+
+  forgotPassword:
+    handler: lambda/auth/forgotPassword.handler
+    events:
+      - http:
+          path: auth/forgot-password
+          method: post
+          cors: true
+    description: Forgot password endpoint
+
+  resetPassword:
+    handler: lambda/auth/resetPassword.handler
+    events:
+      - http:
+          path: auth/reset-password
+          method: post
+          cors: true
+    description: Reset password endpoint
+
+  # Riddle Functions
+  fetchRiddle:
+    handler: lambda/riddles/fetchRiddle.handler
+    events:
+      - http:
+          path: riddles/random
+          method: get
+          cors: true
+    description: Fetch random riddle for player
+
+  validateAnswer:
+    handler: lambda/riddles/validateAnswer.handler
+    events:
+      - http:
+          path: riddles/validate
+          method: post
+          cors: true
+    description: Validate riddle answer
+
+  solveRiddle:
+    handler: lambda/riddles/solveRiddle.handler
+    events:
+      - http:
+          path: riddles/solve
+          method: post
+          cors: true
+    description: Mark riddle as solved and update progress
+
+  playerProgress:
+    handler: lambda/riddles/playerProgress.handler
+    events:
+      - http:
+          path: riddles/progress
+          method: get
+          cors: true
+    description: Get player progress
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-dynamodb-local
+
+package:
+  individually: true
+  patterns:
+    - '!node_modules/**'
+    - '!.git/**'
+    - '!.env'
+    - '!dist/**'

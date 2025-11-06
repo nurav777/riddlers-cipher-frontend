@@ -1,0 +1,217 @@
+{
+  "info": {
+    "name": "Gotham Cipher Backend - Lambda API",
+    "description": "Complete API collection for testing Gotham Cipher Backend deployed on AWS Lambda",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"TestPassword123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"username\": \"testuser\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"TestPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/forgot-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"code\": \"123456\",\n  \"newPassword\": \"NewPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "reset-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Riddles",
+      "item": [
+        {
+          "name": "Fetch Random Riddle",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/riddles/random?levelId=1&difficulty=easy&type=cipher&excludeSolved=true",
+              "host": ["{{base_url}}"],
+              "path": ["riddles", "random"],
+              "query": [
+                {
+                  "key": "levelId",
+                  "value": "1"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "easy"
+                },
+                {
+                  "key": "type",
+                  "value": "cipher"
+                },
+                {
+                  "key": "excludeSolved",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validate Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"riddleId\": \"level-1-riddle-1\",\n  \"answer\": \"ARKHAM\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/riddles/validate",
+              "host": ["{{base_url}}"],
+              "path": ["riddles", "validate"]
+            }
+          }
+        },
+        {
+          "name": "Solve Riddle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"riddleId\": \"level-1-riddle-1\",\n  \"levelId\": 1,\n  \"stars\": 3,\n  \"completionTime\": 45000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/riddles/solve",
+              "host": ["{{base_url}}"],
+              "path": ["riddles", "solve"]
+            }
+          }
+        },
+        {
+          "name": "Get Player Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/riddles/progress",
+              "host": ["{{base_url}}"],
+              "path": ["riddles", "progress"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://your-api-gateway-url.execute-api.ap-southeast-2.amazonaws.com/prod",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "your-jwt-token-here",
+      "type": "string"
+    }
+  ]
+}

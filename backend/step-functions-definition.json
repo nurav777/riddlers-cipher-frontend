@@ -1,0 +1,77 @@
+{
+  "Comment": "Gotham Cipher Riddle Solving Workflow",
+  "StartAt": "GetRandomRiddle",
+  "States": {
+    "GetRandomRiddle": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT:function:GetRandomRiddleFunction",
+      "Parameters": {
+        "queryStringParameters.$": "$.queryStringParameters",
+        "headers.$": "$.headers"
+      },
+      "ResultPath": "$.riddleResult",
+      "Next": "ValidateAnswer"
+    },
+    "ValidateAnswer": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT:function:ValidateAnswerFunction",
+      "Parameters": {
+        "body.$": "$.body",
+        "headers.$": "$.headers"
+      },
+      "ResultPath": "$.validationResult",
+      "Next": "CheckValidationResult"
+    },
+    "CheckValidationResult": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.validationResult.body",
+          "StringEquals": "{\"success\":true,\"data\":{\"isValid\":true}}",
+          "Next": "SolveRiddle"
+        }
+      ],
+      "Default": "ReturnValidationResult"
+    },
+    "SolveRiddle": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT:function:SolveRiddleFunction",
+      "Parameters": {
+        "body.$": "$.body",
+        "headers.$": "$.headers"
+      },
+      "ResultPath": "$.solveResult",
+      "Next": "GetPlayerProgress"
+    },
+    "GetPlayerProgress": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT:function:GetPlayerProgressFunction",
+      "Parameters": {
+        "headers.$": "$.headers"
+      },
+      "ResultPath": "$.progressResult",
+      "Next": "ReturnFinalResult"
+    },
+    "ReturnValidationResult": {
+      "Type": "Pass",
+      "Result": {
+        "statusCode": 200,
+        "body.$": "$.validationResult.body"
+      },
+      "End": true
+    },
+    "ReturnFinalResult": {
+      "Type": "Pass",
+      "Result": {
+        "statusCode": 200,
+        "body": {
+          "riddle.$": "$.riddleResult.body",
+          "validation.$": "$.validationResult.body",
+          "solve.$": "$.solveResult.body",
+          "progress.$": "$.progressResult.body"
+        }
+      },
+      "End": true
+    }
+  }
+}
