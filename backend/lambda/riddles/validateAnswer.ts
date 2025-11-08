@@ -59,7 +59,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return createResponse(200, {
       success: true,
       data: { isValid },
-      message: isValid ? 'Answer is correct!' : 'Answer is incorrect',
+      message: 'Validation completed',
     });
   } catch (error: any) {
     console.error('ValidateAnswer Lambda error:', error);

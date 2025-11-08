@@ -366,7 +366,11 @@ export const api = {
   },
   
   async validateRiddleAnswer(riddleId: string, answer: string) {
-    return request<ApiResponse<{ isValid: boolean }>>("/riddles/validate", {
+    return request<ApiResponse<{
+      isValid?: boolean;
+      isCorrect?: boolean;
+      updatedProgress?: any;
+    }>>("/riddles/validate", {
       method: "POST",
       body: JSON.stringify({ riddleId, answer }),
     });

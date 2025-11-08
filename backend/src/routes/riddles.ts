@@ -156,7 +156,7 @@ router.post('/validate', async (req: Request, res: Response) => {
     res.json({
       success: true,
       data: { isValid },
-      message: isValid ? 'Answer is correct!' : 'Answer is incorrect',
+      message: 'Validation completed',
     });
   } catch (error: any) {
     console.error('Validate answer error:', error);
