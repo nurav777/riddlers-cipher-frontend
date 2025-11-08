@@ -110,11 +110,19 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
     const currentRiddle = riddles[currentRiddleIndex];
     if (!currentRiddle) return;
 
+    console.log('📝 Submitting answer:', {
+      riddleId: currentRiddle.riddleId,
+      userAnswer: userAnswer.trim(),
+      expectedAnswer: currentRiddle.answer,
+    });
+
     setIsValidating(true);
     setValidationResult(null);
 
     try {
       const isValid = await validateAnswer(currentRiddle.riddleId, userAnswer.trim());
+      
+      console.log('📊 Validation received:', isValid);
       
       if (isValid) {
         setValidationResult('correct');

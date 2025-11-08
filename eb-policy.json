@@ -1,0 +1,27 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticbeanstalk:*",
+        "ec2:*",
+        "rds:*",
+        "s3:*",
+        "cloudformation:*",
+        "autoscaling:*",
+        "cloudwatch:*",
+        "logs:*",
+        "sns:*",
+        "sqs:*",
+        "iam:GetRole",
+        "iam:PassRole",
+        "iam:CreateRole",
+        "iam:CreateInstanceProfile",
+        "iam:AddRoleToInstanceProfile",
+        "iam:PutRolePolicy"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

@@ -541,7 +541,17 @@ export class RiddleService {
       const normalizedAnswer = userAnswer.trim().toUpperCase();
       const correctAnswer = riddle.answer.trim().toUpperCase();
 
-      return normalizedAnswer === correctAnswer;
+      const isMatch = normalizedAnswer === correctAnswer;
+      
+      console.log(`Normalized User Answer: "${normalizedAnswer}" (length: ${normalizedAnswer.length})`);
+      console.log(`Correct Answer: "${correctAnswer}" (length: ${correctAnswer.length})`);
+      console.log(`Match Result: ${isMatch}`);
+      console.log("Character codes comparison:");
+      console.log(`User: [${Array.from(normalizedAnswer).map(c => c.charCodeAt(0)).join(', ')}]`);
+      console.log(`Correct: [${Array.from(correctAnswer).map(c => c.charCodeAt(0)).join(', ')}]`);
+      console.log("=".repeat(80) + "\n");
+
+      return isMatch;
     } catch (error: any) {
       console.error("Validate answer error:", error);
       throw new Error(`Failed to validate answer: ${error.message}`);

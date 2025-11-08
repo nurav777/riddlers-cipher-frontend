@@ -96,13 +96,27 @@ export const useRiddles = () => {
     try {
       const response = await api.validateRiddleAnswer(riddleId, answer);
       
-      if (response.success && response.data) {
+      console.log('🔍 Validation Response:', {
+        success: response.success,
+        message: response.message,
+        data: response.data,
+        isValid: response.data?.isValid,
+      });
+      
+      // Check if response has valid data (even if isValid is false)
+      if (response.success && response.data !== undefined && 'isValid' in response.data) {
+        console.log(`✅ Validation result: ${response.data.isValid ? 'CORRECT' : 'INCORRECT'}`);
         return response.data.isValid;
       } else {
-        throw new Error(response.message || 'Failed to validate answer');
+        // Only set error if there's an actual API error
+        const errorMessage = response.message || 'Failed to validate answer';
+        console.error('❌ Validation error:', errorMessage);
+        setError(errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to validate answer';
+      console.error('❌ Validation error:', errorMessage);
       setError(errorMessage);
       throw new Error(errorMessage);
     }

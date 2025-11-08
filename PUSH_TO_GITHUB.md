@@ -48,13 +48,14 @@ git add .
 git commit -m "Initial commit: Gotham Cipher frontend with Lambda integration"
 
 # Add remote repository (replace USERNAME and REPO)
-git remote add origin https://github.com/USERNAME/riddlers-cipher-frontend.git
+git remote add origin https://github.com/nurav777/riddlers-cipher-frontend.git
 
 # Verify remote
 git remote -v
 ```
 
 Expected output:
+
 ```
 origin  https://github.com/USERNAME/riddlers-cipher-frontend.git (fetch)
 origin  https://github.com/USERNAME/riddlers-cipher-frontend.git (push)
@@ -73,6 +74,7 @@ git push -u origin main
 ```
 
 You'll be prompted for credentials:
+
 - **Username:** Your GitHub username
 - **Password:** Your GitHub personal access token (not your password!)
 
@@ -311,6 +313,7 @@ git push -u origin main
 ### Issue: "fatal: not a git repository"
 
 **Solution:**
+
 ```powershell
 git init
 ```
@@ -318,6 +321,7 @@ git init
 ### Issue: "remote origin already exists"
 
 **Solution:**
+
 ```powershell
 git remote remove origin
 git remote add origin https://github.com/USERNAME/REPO.git
@@ -326,6 +330,7 @@ git remote add origin https://github.com/USERNAME/REPO.git
 ### Issue: "Authentication failed"
 
 **Solution:**
+
 1. Use personal access token instead of password
 2. Create token at: https://github.com/settings/tokens
 3. Use token as password when pushing
@@ -334,6 +339,7 @@ git remote add origin https://github.com/USERNAME/REPO.git
 
 **Solution:**
 The `.env` file should be pushed. If it's not:
+
 ```powershell
 git add .env
 git commit -m "Add environment variables"
@@ -343,6 +349,7 @@ git push
 ### Issue: "Repository not showing in Amplify"
 
 **Solution:**
+
 1. Refresh the page
 2. Re-authorize GitHub connection
 3. Check repository is public (or private with proper permissions)
