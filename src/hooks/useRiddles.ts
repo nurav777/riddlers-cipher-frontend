@@ -100,20 +100,15 @@ export const useRiddles = () => {
         success: response.success,
         message: response.message,
         data: response.data,
-        isValid: response.data?.isValid,
         isCorrect: response.data?.isCorrect,
       });
       
-      if (response.success && response.data !== undefined) {
-        // Handle both response formats:
-        // Format 1: { isValid: boolean }
-        // Format 2: { isCorrect: boolean, updatedProgress: {...} }
-        const isValid = response.data.isValid !== undefined ? response.data.isValid : response.data.isCorrect;
-        
-        console.log(`✅ Validation result: ${isValid ? 'CORRECT' : 'INCORRECT'}`);
-        return isValid;
+      // Handle validation response
+      if (response.data !== undefined && response.data.isCorrect !== undefined) {
+        console.log(`✅ Validation result: ${response.data.isCorrect ? 'CORRECT' : 'INCORRECT'}`);
+        return response.data.isCorrect;
       } else {
-        // Only set error if there's an actual API error
+        // Only set error if there's no data at all
         const errorMessage = response.message || 'Failed to validate answer';
         console.error('❌ Validation error:', errorMessage);
         setError(errorMessage);
