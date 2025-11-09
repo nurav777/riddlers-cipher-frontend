@@ -156,8 +156,13 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
         newSolvedRiddles[currentRiddleIndex] = true;
         setSolvedRiddles(newSolvedRiddles);
         
-        // Reset start time for next riddle
-        setRiddleStartTime(Date.now());
+        console.log('DEBUG riddle solved:', {
+          riddleIndex: currentRiddleIndex,
+          solveTime,
+          newRiddleTimes,
+          newSolvedRiddles,
+          totalSolvedCount: newSolvedRiddles.filter(Boolean).length,
+        });
 
         // Don't update backend yet - wait for level completion to send final stars
 
@@ -195,11 +200,14 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
       console.log('DEBUG handleLevelComplete:', {
         completedCount,
         riddlesLength: riddles.length,
+        solvedRiddles,
+        riddleTimes,
         totalTimeTaken,
         timeLimit,
         timePercentage,
         condition1: completedCount === riddles.length && timePercentage < 0.6,
         condition2: completedCount >= 2 && timePercentage < 0.8,
+        elapsedSinceStart: Date.now() - riddleStartTime,
       });
       
       if (completedCount === riddles.length && timePercentage < 0.6) {
