@@ -156,17 +156,7 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
         newSolvedRiddles[currentRiddleIndex] = true;
         setSolvedRiddles(newSolvedRiddles);
 
-        // Update progress in backend
-        try {
-          await solveRiddle(
-            currentRiddle.riddleId,
-            level.levelId,
-            1, // 1 star for solving
-            solveTime
-          );
-        } catch (err) {
-          console.error('Failed to update progress:', err);
-        }
+        // Don't update backend yet - wait for level completion to send final stars
 
         // Move to next riddle or complete level
         setTimeout(() => {
@@ -211,20 +201,21 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
       }
     }
     
-    // Update the last riddle's star count to reflect final calculation
-    if (completedCount > 0 && riddles.length > 0) {
-      const lastRiddleIndex = riddles.length - 1;
-      if (solvedRiddles[lastRiddleIndex]) {
-        try {
-          await solveRiddle(
-            riddles[lastRiddleIndex].riddleId,
-            level.levelId,
-            stars, // Send final calculated stars
-            riddleTimes[lastRiddleIndex] || 0
-          );
-        } catch (err) {
-          console.error('Failed to update final progress:', err);
+    // Send final calculated stars for each solved riddle
+    if (completedCount > 0) {
+      try {
+        for (let i = 0; i < solvedRiddles.length; i++) {
+          if (solvedRiddles[i]) {
+            await solveRiddle(
+              riddles[i].riddleId,
+              level.levelId,
+              stars, // Send final calculated stars for all riddles
+              riddleTimes[i] || 0
+            );
+          }
         }
+      } catch (err) {
+        console.error('Failed to update final progress:', err);
       }
     }
     
