@@ -171,9 +171,10 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
           if (currentRiddleIndex < riddles.length - 1) {
             setCurrentRiddleIndex(prev => prev + 1);
           } else {
-            handleLevelComplete();
+            // Pass the updated arrays to handleLevelComplete to avoid stale state
+            handleLevelComplete(newSolvedRiddles, newRiddleTimes);
           }
-        }, 1500);
+        }, 1000);
       } else {
         setValidationResult('incorrect');
         setTimeout(() => {
@@ -188,13 +189,17 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
     }
   };
 
-  const handleLevelComplete = async () => {
-    const completedCount = solvedRiddles.filter(Boolean).length;
+  const handleLevelComplete = async (finalSolvedRiddles?: boolean[], finalRiddleTimes?: number[]) => {
+    // Use passed parameters if available (to avoid stale state), otherwise use state
+    const solvedArray = finalSolvedRiddles || solvedRiddles;
+    const timesArray = finalRiddleTimes || riddleTimes;
+    
+    const completedCount = solvedArray.filter(Boolean).length;
     let stars = completedCount;
     
     // Bonus star logic for completing under time
     if (completedCount > 0) {
-      const totalTimeTaken = riddleTimes.reduce((sum, time) => sum + time, 0);
+      const totalTimeTaken = timesArray.reduce((sum, time) => sum + time, 0);
       const timePercentage = totalTimeTaken / timeLimit;
       
       console.log('DEBUG handleLevelComplete:', {
@@ -227,13 +232,13 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
     // Send final calculated stars for each solved riddle
     if (completedCount > 0) {
       try {
-        for (let i = 0; i < solvedRiddles.length; i++) {
-          if (solvedRiddles[i]) {
+        for (let i = 0; i < solvedArray.length; i++) {
+          if (solvedArray[i]) {
             await solveRiddle(
               riddles[i].riddleId,
               level.levelId,
               stars, // Send final calculated stars for all riddles
-              riddleTimes[i] || 0
+              timesArray[i] || 0
             );
           }
         }
