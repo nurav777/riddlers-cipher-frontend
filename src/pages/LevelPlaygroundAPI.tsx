@@ -94,9 +94,27 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
     setValidationResult(null);
   }, [currentRiddleIndex]);
 
-  const handleTimeUp = () => {
+  const handleTimeUp = async () => {
     const completedCount = solvedRiddles.filter(Boolean).length;
-    const stars = Math.min(completedCount, 3);
+    let stars = completedCount;
+    
+    // Bonus star logic for completing under time
+    if (completedCount > 0) {
+      const totalTimeTaken = riddleTimes.reduce((sum, time) => sum + time, 0);
+      const timePercentage = totalTimeTaken / timeLimit;
+      
+      if (completedCount === riddles.length && timePercentage < 0.6) {
+        // All solved under 60% of time limit - award 3 stars
+        stars = 3;
+      } else if (completedCount >= 2 && timePercentage < 0.8) {
+        // 2+ solved under 80% of time limit - award 2-3 stars based on count
+        stars = Math.min(completedCount + 1, 3);
+      } else {
+        // Standard: 1 star per riddle solved, max 3
+        stars = Math.min(completedCount, 3);
+      }
+    }
+    
     setGameComplete(true);
     
     setTimeout(() => {
@@ -172,9 +190,44 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
     }
   };
 
-  const handleLevelComplete = () => {
+  const handleLevelComplete = async () => {
     const completedCount = solvedRiddles.filter(Boolean).length;
-    const stars = Math.min(completedCount, 3);
+    let stars = completedCount;
+    
+    // Bonus star logic for completing under time
+    if (completedCount > 0) {
+      const totalTimeTaken = riddleTimes.reduce((sum, time) => sum + time, 0);
+      const timePercentage = totalTimeTaken / timeLimit;
+      
+      if (completedCount === riddles.length && timePercentage < 0.6) {
+        // All solved under 60% of time limit - award 3 stars
+        stars = 3;
+      } else if (completedCount >= 2 && timePercentage < 0.8) {
+        // 2+ solved under 80% of time limit - award 2-3 stars based on count
+        stars = Math.min(completedCount + 1, 3);
+      } else {
+        // Standard: 1 star per riddle solved, max 3
+        stars = Math.min(completedCount, 3);
+      }
+    }
+    
+    // Update the last riddle's star count to reflect final calculation
+    if (completedCount > 0 && riddles.length > 0) {
+      const lastRiddleIndex = riddles.length - 1;
+      if (solvedRiddles[lastRiddleIndex]) {
+        try {
+          await solveRiddle(
+            riddles[lastRiddleIndex].riddleId,
+            level.levelId,
+            stars, // Send final calculated stars
+            riddleTimes[lastRiddleIndex] || 0
+          );
+        } catch (err) {
+          console.error('Failed to update final progress:', err);
+        }
+      }
+    }
+    
     setGameComplete(true);
     
     setTimeout(() => {
