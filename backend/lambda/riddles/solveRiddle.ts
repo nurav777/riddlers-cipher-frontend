@@ -61,6 +61,14 @@ export const handler = async (
       });
     }
 
+    console.log("🎯 Before updatePlayerProgress:", {
+      playerId,
+      riddleId,
+      levelId,
+      stars,
+      completionTime,
+    });
+
     const updatedProgress = await riddleService.updatePlayerProgress(
       playerId,
       riddleId,
@@ -68,6 +76,13 @@ export const handler = async (
       stars,
       completionTime
     );
+
+    console.log("🎯 After updatePlayerProgress:", {
+      levelId,
+      bestStars: updatedProgress.levelProgress?.[levelId]?.bestStars,
+      totalScore: updatedProgress.totalScore,
+      allLevelProgress: updatedProgress.levelProgress,
+    });
 
     return createResponse(200, {
       success: true,

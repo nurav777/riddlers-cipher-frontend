@@ -189,6 +189,16 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
       const totalTimeTaken = riddleTimes.reduce((sum, time) => sum + time, 0);
       const timePercentage = totalTimeTaken / timeLimit;
       
+      console.log('DEBUG handleLevelComplete:', {
+        completedCount,
+        riddlesLength: riddles.length,
+        totalTimeTaken,
+        timeLimit,
+        timePercentage,
+        condition1: completedCount === riddles.length && timePercentage < 0.6,
+        condition2: completedCount >= 2 && timePercentage < 0.8,
+      });
+      
       if (completedCount === riddles.length && timePercentage < 0.6) {
         // All solved under 60% of time limit - award 3 stars
         stars = 3;
@@ -199,6 +209,8 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
         // Standard: 1 star per riddle solved, max 3
         stars = Math.min(completedCount, 3);
       }
+      
+      console.log('DEBUG final stars:', stars);
     }
     
     // Send final calculated stars for each solved riddle
