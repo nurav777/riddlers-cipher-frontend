@@ -155,6 +155,9 @@ export const LevelPlaygroundAPI: React.FC<LevelPlaygroundProps> = ({
         const newSolvedRiddles = [...solvedRiddles];
         newSolvedRiddles[currentRiddleIndex] = true;
         setSolvedRiddles(newSolvedRiddles);
+        
+        // Reset start time for next riddle
+        setRiddleStartTime(Date.now());
 
         // Don't update backend yet - wait for level completion to send final stars
 
